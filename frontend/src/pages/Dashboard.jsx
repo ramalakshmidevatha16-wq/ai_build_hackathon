@@ -24,7 +24,6 @@ import {
 } from "recharts";
 
 export default function Dashboard() {
-
   const [dashboard, setDashboard] = useState({});
   const [recommendations, setRecommendations] = useState([]);
   const [analytics, setAnalytics] = useState({
@@ -33,33 +32,24 @@ export default function Dashboard() {
   });
 
   useEffect(() => {
+    const loadData = async () => {
+      try {
+        const dashboardRes = await API.get("/dashboard");
+        console.log("Dashboard API:", dashboardRes.data);
 
-  const loadData = async () => {
+        const recommendationRes = await API.get("/recommendations");
+        const analyticsRes = await API.get("/analytics");
 
-    try {
+        setDashboard(dashboardRes.data);
+        setRecommendations(recommendationRes.data);
+        setAnalytics(analyticsRes.data);
+      } catch (err) {
+        console.error("Dashboard Error:", err);
+      }
+    };
 
-      const [dashboardRes, recommendationRes, analyticsRes] =
-        await Promise.all([
-          API.get("/dashboard"),
-          API.get("/recommendations"),
-          API.get("/analytics"),
-        ]);
-
-      setDashboard(dashboardRes.data);
-      setRecommendations(recommendationRes.data);
-      setAnalytics(analyticsRes.data);
-
-    } catch (err) {
-
-      console.error(err);
-
-    }
-
-  };
-
-  loadData();
-
-}, []);
+    loadData();
+  }, []);
 
   const COLORS = [
     "#3B82F6",
@@ -71,11 +61,9 @@ export default function Dashboard() {
 
   return (
     <div className="flex bg-slate-950 min-h-screen">
-
       <Sidebar />
 
       <div className="flex-1">
-
         <Header />
 
         <div className="p-8">
@@ -106,12 +94,8 @@ export default function Dashboard() {
             />
 
             <StatCard
-              title="Total Sales"
-              value={
-                dashboard.sales
-                  ? "₹" + Number(dashboard.sales).toLocaleString()
-                  : "₹0"
-              }
+              title="Total Inventory"
+              value={dashboard.inventory || 0}
               icon={<FaRobot />}
               color="text-pink-400"
             />
@@ -129,22 +113,15 @@ export default function Dashboard() {
               </h2>
 
               <ResponsiveContainer width="100%" height={300}>
-
                 <BarChart data={analytics.warehouse}>
-
                   <XAxis dataKey="Warehouse_ID" />
-
                   <YAxis />
-
                   <Tooltip />
-
                   <Bar
                     dataKey="Inventory_Level"
                     fill="#3B82F6"
                   />
-
                 </BarChart>
-
               </ResponsiveContainer>
 
             </div>
@@ -156,7 +133,6 @@ export default function Dashboard() {
               </h2>
 
               <ResponsiveContainer width="100%" height={300}>
-
                 <PieChart>
 
                   <Pie
@@ -166,22 +142,17 @@ export default function Dashboard() {
                     outerRadius={100}
                     label
                   >
-
                     {analytics.region.map((entry, index) => (
-
                       <Cell
                         key={index}
                         fill={COLORS[index % COLORS.length]}
                       />
-
                     ))}
-
                   </Pie>
 
                   <Tooltip />
 
                 </PieChart>
-
               </ResponsiveContainer>
 
             </div>
@@ -244,17 +215,13 @@ export default function Dashboard() {
             <table className="w-full text-white">
 
               <thead>
-
                 <tr className="border-b border-slate-700">
-
                   <th className="text-left py-3">SKU</th>
                   <th className="text-left">From</th>
                   <th className="text-left">To</th>
                   <th className="text-left">Qty</th>
                   <th className="text-left">Priority</th>
-
                 </tr>
-
               </thead>
 
               <tbody>
@@ -265,13 +232,11 @@ export default function Dashboard() {
                     key={index}
                     className="border-b border-slate-700"
                   >
-
                     <td className="py-3">{item.sku}</td>
                     <td>{item.from_warehouse}</td>
                     <td>{item.to_warehouse}</td>
                     <td>{item.transfer_quantity}</td>
                     <td>{item.priority}</td>
-
                   </tr>
 
                 ))}
@@ -283,9 +248,7 @@ export default function Dashboard() {
           </div>
 
         </div>
-
       </div>
-
     </div>
   );
 }

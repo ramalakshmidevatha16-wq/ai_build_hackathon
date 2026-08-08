@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
 import Login from "./pages/Login";
 import ImportData from "./pages/ImportData";
@@ -11,29 +11,16 @@ import AIAgents from "./pages/AIAgents";
 
 function App() {
   return (
-    <BrowserRouter>
-
-      <Routes>
-
-        <Route path="/" element={<Login />} />
-
-        <Route path="/import" element={<ImportData />} />
-
-        <Route path="/dashboard" element={<Dashboard />} />
-
-        <Route path="/inventory" element={<Inventory />} />
-
-        <Route path="/warehouses" element={<Warehouses />} />
-
-        <Route path="/analytics" element={<Analytics />} />
-
-        <Route path="/recommendations" element={<Recommendations />} />
-
-        <Route path="/agents" element={<AIAgents />} />
-
-      </Routes>
-
-    </BrowserRouter>
+    <Routes>
+      <Route path="/" element={<Login />} />
+      <Route path="/import" element={<ImportData />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/inventory" element={<Inventory />} />
+      <Route path="/warehouses" element={<Warehouses />} />
+      <Route path="/analytics" element={<Analytics />} />
+      <Route path="/recommendations" element={<Recommendations />} />
+      <Route path="/agents" element={<AIAgents />} />
+    </Routes>
   );
 }
 

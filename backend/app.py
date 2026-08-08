@@ -10,10 +10,10 @@ CORS(app)
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# Load default datasets
-sales_df = pd.read_csv("../store_sales_data (2).csv")
+# Default dataset
 inventory_df = pd.read_csv("../supply_chain_dataset1.csv")
 
+# AI Optimizer
 optimizer = InventoryOptimizer(inventory_df)
 
 
@@ -27,25 +27,12 @@ def home():
 @app.route("/dashboard")
 def dashboard():
 
-    warehouses = inventory_df["Warehouse_ID"].nunique()
-    products = inventory_df["SKU_ID"].nunique()
-    stockouts = int(inventory_df["Stockout_Flag"].sum())
-    total_sales = float(sales_df["Sales"].sum())
-
     return jsonify({
-        "warehouses": warehouses,
-        "products": products,
-        "stockouts": stockouts,
-        "sales": round(total_sales, 2)
+        "warehouses": int(inventory_df["Warehouse_ID"].nunique()),
+        "products": int(inventory_df["SKU_ID"].nunique()),
+        "stockouts": int(inventory_df["Stockout_Flag"].sum()),
+        "inventory": int(inventory_df["Inventory_Level"].sum())
     })
-
-
-@app.route("/recommendations")
-def recommendations():
-
-    data = optimizer.analyze_inventory()
-
-    return jsonify(data)
 
 
 @app.route("/inventory")
@@ -118,6 +105,18 @@ def analytics():
     })
 
 
+@app.route("/recommendations")
+def recommendations():
+
+    global optimizer
+
+    optimizer = InventoryOptimizer(inventory_df)
+
+    data = optimizer.analyze_inventory()
+
+    return jsonify(data)
+
+
 @app.route("/upload", methods=["POST"])
 def upload():
 
@@ -142,11 +141,19 @@ def upload():
 
         optimizer = InventoryOptimizer(inventory_df)
 
+        print("========== NEW CSV LOADED ==========")
+        print("Rows:", len(inventory_df))
+        print("Warehouses:", inventory_df["Warehouse_ID"].nunique())
+        print("Products:", inventory_df["SKU_ID"].nunique())
+        print("Inventory:", inventory_df["Inventory_Level"].sum())
+        print("====================================")
+
         return jsonify({
             "message": "Upload Successful",
             "rows": len(inventory_df),
             "warehouses": int(inventory_df["Warehouse_ID"].nunique()),
-            "products": int(inventory_df["SKU_ID"].nunique())
+            "products": int(inventory_df["SKU_ID"].nunique()),
+            "inventory": int(inventory_df["Inventory_Level"].sum())
         })
 
     except Exception as e:
